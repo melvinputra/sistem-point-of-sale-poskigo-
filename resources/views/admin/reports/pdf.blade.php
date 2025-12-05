@@ -121,7 +121,7 @@
                 @foreach($topItems as $item)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $item->item->name }}</td>
+                    <td>{{ $item->item ? $item->item->name : '[Item dihapus]' }}</td>
                     <td>{{ $item->total_qty }} pcs</td>
                     <td>Rp {{ number_format($item->total_sales, 0, ',', '.') }}</td>
                 </tr>

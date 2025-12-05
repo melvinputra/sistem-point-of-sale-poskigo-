@@ -32,7 +32,6 @@ class PromotionController extends Controller
             'max_usage' => 'nullable|integer|min:1',
             'valid_from' => 'required|date',
             'valid_until' => 'required|date|after_or_equal:valid_from',
-            'is_active' => 'boolean'
         ]);
 
         DB::beginTransaction();
@@ -47,7 +46,7 @@ class PromotionController extends Controller
                 'usage_count' => 0,
                 'valid_from' => $request->valid_from,
                 'valid_until' => $request->valid_until,
-                'is_active' => $request->has('is_active') ? true : false
+                'is_active' => $request->has('is_active') ? 1 : 0
             ]);
 
             // Log activity
@@ -90,7 +89,6 @@ class PromotionController extends Controller
             'max_usage' => 'nullable|integer|min:1',
             'valid_from' => 'required|date',
             'valid_until' => 'required|date|after_or_equal:valid_from',
-            'is_active' => 'boolean'
         ]);
 
         DB::beginTransaction();
@@ -106,7 +104,7 @@ class PromotionController extends Controller
                 'max_usage' => $request->max_usage,
                 'valid_from' => $request->valid_from,
                 'valid_until' => $request->valid_until,
-                'is_active' => $request->has('is_active') ? true : false
+                'is_active' => $request->has('is_active') ? 1 : 0
             ]);
 
             // Log activity

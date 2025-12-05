@@ -152,7 +152,7 @@ class SaleController extends Controller
             if ($promotion) {
                 VoucherUsage::create([
                     'promotion_id' => $promotion->id,
-                    'user_id' => $request->customer_id,
+                    'user_id' => auth()->id(), // User yang login (kasir)
                     'sale_id' => $sale->id,
                     'discount_amount' => $discountAmount
                 ]);

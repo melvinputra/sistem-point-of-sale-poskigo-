@@ -39,7 +39,7 @@ trait LogsActivity
         // Get model name without namespace
         $modelName = class_basename(get_class($this));
         
-        // Get user if authenticated
+        // Get user if authenticated (for new user registration, user_id will be null)
         $userId = Auth::check() ? Auth::id() : null;
         
         // Get model identifier (ID or name)
@@ -47,7 +47,7 @@ trait LogsActivity
         
         // Build description
         $description = match($action) {
-            'created' => "{$modelName} '{$identifier}' telah dibuat",
+            'created' => "{$modelName} '{$identifier}' telah dibuat" . ($userId ? '' : ' (Registrasi baru)'),
             'updated' => "{$modelName} '{$identifier}' telah diupdate",
             'deleted' => "{$modelName} '{$identifier}' telah dihapus",
             default => "{$modelName} '{$identifier}' - {$action}",
@@ -61,7 +61,7 @@ trait LogsActivity
 
         // Create activity log
         ActivityLog::create([
-            'user_id' => $userId,
+            'user_id' => $userId, // Will be null for new user registration
             'action' => $action,
             'model_type' => $modelName,
             'model_id' => $this->id,

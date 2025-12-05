@@ -12,21 +12,55 @@ class KasirController extends Controller
 {
     public function dashboard()
     {
+        // Penjualan hari ini oleh kasir ini
         $todaySales = Sale::where('user_id', auth()->id())
             ->whereDate('created_at', today())
             ->sum('total_amount');
         
+        // Jumlah transaksi hari ini oleh kasir ini
         $todayTransactions = Sale::where('user_id', auth()->id())
             ->whereDate('created_at', today())
             ->count();
 
+        // Penjualan bulan ini oleh kasir ini
+        $monthlySales = Sale::where('user_id', auth()->id())
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total_amount');
+
+        // Total transaksi bulan ini oleh kasir ini
+        $monthlyTransactions = Sale::where('user_id', auth()->id())
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // Riwayat transaksi terbaru
         $recentSales = Sale::where('user_id', auth()->id())
             ->with('customer')
             ->latest()
             ->take(10)
             ->get();
 
-        return view('kasir.dashboard', compact('todaySales', 'todayTransactions', 'recentSales'));
+        // Item terlaris hari ini oleh kasir ini
+        $topItems = SaleItem::select('item_id', DB::raw('SUM(quantity) as total_qty'))
+            ->whereHas('sale', function($query) {
+                $query->where('user_id', auth()->id())
+                    ->whereDate('created_at', today());
+            })
+            ->with('item.category')
+            ->groupBy('item_id')
+            ->orderBy('total_qty', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('kasir.dashboard', compact(
+            'todaySales', 
+            'todayTransactions', 
+            'monthlySales',
+            'monthlyTransactions',
+            'recentSales',
+            'topItems'
+        ));
     }
 
     public function reports(Request $request)

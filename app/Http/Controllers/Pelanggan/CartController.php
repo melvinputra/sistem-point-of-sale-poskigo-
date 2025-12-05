@@ -162,23 +162,36 @@ class CartController extends Controller
             $discountAmount = 0;
 
             if ($request->promotion_code) {
-                $promotion = Promotion::where('code', $request->promotion_code)
+                $promoCode = strtoupper(trim($request->promotion_code));
+                
+                $promotion = Promotion::where('code', $promoCode)
                     ->where('is_active', true)
-                    ->whereDate('valid_from', '<=', now())
-                    ->whereDate('valid_until', '>=', now())
                     ->first();
 
-                if ($promotion) {
-                    if (!$promotion->isValid()) {
-                        throw new \Exception("Kode promo tidak valid atau sudah habis!");
-                    }
-                    
-                    if ($subtotal < $promotion->min_purchase) {
-                        throw new \Exception("Minimal pembelian untuk promo ini: Rp " . number_format($promotion->min_purchase, 0, ',', '.'));
-                    }
-
-                    $discountAmount = $promotion->calculateDiscount($subtotal);
+                if (!$promotion) {
+                    throw new \Exception("Kode promo '$promoCode' tidak ditemukan atau tidak aktif!");
                 }
+                
+                // Cek validitas promo (tanggal, max usage, dll)
+                if (!$promotion->isValid()) {
+                    // Berikan pesan error yang lebih spesifik
+                    if (!$promotion->is_active) {
+                        throw new \Exception("Kode promo tidak aktif!");
+                    } elseif ($promotion->max_usage !== null && $promotion->usage_count >= $promotion->max_usage) {
+                        throw new \Exception("Kode promo sudah mencapai batas maksimal penggunaan!");
+                    } else {
+                        $validFrom = \Carbon\Carbon::parse($promotion->valid_from)->format('d/m/Y');
+                        $validUntil = \Carbon\Carbon::parse($promotion->valid_until)->format('d/m/Y');
+                        throw new \Exception("Kode promo hanya berlaku dari $validFrom sampai $validUntil!");
+                    }
+                }
+                
+                // Cek minimal pembelian
+                if ($subtotal < $promotion->min_purchase) {
+                    throw new \Exception("Minimal pembelian untuk promo ini: Rp " . number_format($promotion->min_purchase, 0, ',', '.'));
+                }
+
+                $discountAmount = $promotion->calculateDiscount($subtotal);
             }
 
             // Tax 10%
@@ -253,7 +266,7 @@ class CartController extends Controller
             if ($promotion) {
                 VoucherUsage::create([
                     'promotion_id' => $promotion->id,
-                    'user_id' => $customer->id,
+                    'user_id' => auth()->id(), // User yang login (pelanggan)
                     'sale_id' => $sale->id,
                     'discount_amount' => $discountAmount
                 ]);

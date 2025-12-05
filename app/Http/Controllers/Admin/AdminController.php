@@ -41,30 +41,8 @@ class AdminController extends Controller
             ->orderBy('stock', 'asc')
             ->get();
         
-        // Pending Top-Up Requests
+                // Pending Top-up Requests
         $pendingTopups = TopupRequest::where('status', 'pending')->count();
-        
-        // Data untuk Chart.js - Penjualan 7 hari terakhir
-        $salesChart = Sale::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(total_amount) as total')
-            )
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
-        
-        // Format data untuk Chart.js
-        $chartLabels = [];
-        $chartData = [];
-        
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $chartLabels[] = Carbon::now()->subDays($i)->format('d M');
-            
-            $salesOnDate = $salesChart->firstWhere('date', $date);
-            $chartData[] = $salesOnDate ? $salesOnDate->total : 0;
-        }
 
         return view('admin.dashboard', compact(
             'totalItems',
@@ -75,9 +53,7 @@ class AdminController extends Controller
             'notifications',
             'unreadCount',
             'lowStockItems',
-            'pendingTopups',
-            'chartLabels',
-            'chartData'
+            'pendingTopups'
         ));
     }
     

@@ -104,8 +104,12 @@
 
                     <div class="mb-3">
                         <div class="form-check">
-                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" 
-                                   {{ old('is_active') ? 'checked' : '' }}>
+                            <input type="checkbox" 
+                                   name="is_active" 
+                                   class="form-check-input" 
+                                   id="isActive" 
+                                   value="1"
+                                   {{ old('is_active', $promotion->is_active) ? 'checked' : '' }}>
                             <label class="form-check-label" for="isActive">
                                 Aktifkan promo ini sekarang
                             </label>

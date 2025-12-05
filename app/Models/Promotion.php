@@ -39,11 +39,27 @@ class Promotion extends Model
 
     public function isValid()
     {
-        $today = Carbon::today();
+        // Pastikan promo aktif
+        if (!$this->is_active) {
+            return false;
+        }
         
-        return $this->is_active 
-               && $today->between($this->valid_from, $this->valid_until)
-               && ($this->max_usage === null || $this->usage_count < $this->max_usage);
+        // Cek tanggal berlaku (gunakan Carbon untuk parsing yang lebih baik)
+        $today = Carbon::now()->startOfDay();
+        $validFrom = Carbon::parse($this->valid_from)->startOfDay();
+        $validUntil = Carbon::parse($this->valid_until)->endOfDay();
+        
+        // Cek apakah hari ini dalam rentang tanggal berlaku
+        if ($today->lt($validFrom) || $today->gt($validUntil)) {
+            return false;
+        }
+        
+        // Cek max usage (jika diset)
+        if ($this->max_usage !== null && $this->usage_count >= $this->max_usage) {
+            return false;
+        }
+        
+        return true;
     }
 
     public function calculateDiscount($subtotal)

@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'POSKigo')</title>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,85 +17,203 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     
     <style>
-        :root {
-            --primary-blue: #1e88e5;
-            --primary-orange: #ff6f00;
-            --dark-blue: #0d47a1;
+        * {
+            font-family: 'Inter', sans-serif;
         }
         
-        .navbar {
-            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-orange) 100%) !important;
+        :root {
+            --primary-green: #C4FF57;
+            --secondary-green: #9FE869;
+            --dark-green: #5a8e2a;
+            --gradient-primary: linear-gradient(135deg, #C4FF57 0%, #9FE869 100%);
         }
-        .navbar-brand, .nav-link {
-            color: white !important;
+        
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
         }
-        .nav-link:hover {
-            opacity: 0.8;
+        
+        /* Modern Navbar */
+        .navbar-modern {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .card {
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+        
+        .navbar-brand-modern {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link-modern {
+            color: #2a2a2a !important;
+            font-weight: 600;
+            padding: 0.5rem 1rem !important;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+        
+        .nav-link-modern:hover,
+        .nav-link-modern.active {
+            background: var(--gradient-primary);
+            color: #1a1a1a !important;
+        }
+        
+        .nav-link-modern i {
+            margin-right: 0.5rem;
+        }
+        
+        .user-dropdown-modern {
+            background: var(--gradient-primary);
+            color: #1a1a1a !important;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(196, 255, 87, 0.3);
+        }
+        
+        .user-dropdown-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(196, 255, 87, 0.4);
+        }
+        
+        .dropdown-menu-modern {
             border: none;
-            border-radius: 0.5rem;
-            transition: transform 0.2s;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            padding: 0.5rem;
         }
+        
+        .dropdown-item-modern {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown-item-modern:hover {
+            background: var(--gradient-primary);
+            color: #1a1a1a;
+        }
+        
+        /* Card Modern */
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
-        .btn-primary {
-            background-color: var(--primary-blue);
-            border-color: var(--primary-blue);
+        
+        /* Button Modern */
+        .btn-modern-primary {
+            background: var(--gradient-primary);
+            border: none;
+            color: #1a1a1a;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(196, 255, 87, 0.3);
         }
-        .btn-warning {
-            background-color: var(--primary-orange);
-            border-color: var(--primary-orange);
-            color: white;
+        
+        .btn-modern-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196, 255, 87, 0.4);
+            color: #1a1a1a;
+        }
+        
+        .btn-modern-secondary {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            color: #495057;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-modern-secondary:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 180px);
+        }
+        
+        /* Footer */
+        .footer-modern {
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 2rem 0;
+            margin-top: 4rem;
         }
     </style>
     
     @stack('styles')
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+    <!-- Modern Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('pelanggan.dashboard') }}">
-                <strong>POSKigo</strong>
+            <a class="navbar-brand navbar-brand-modern" href="{{ route('pelanggan.dashboard') }}">
+                <i class="fas fa-store me-2"></i>POSKigo
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pelanggan.dashboard') }}">
+                        <a class="nav-link nav-link-modern {{ request()->routeIs('pelanggan.dashboard') ? 'active' : '' }}" 
+                           href="{{ route('pelanggan.dashboard') }}">
                             <i class="fas fa-home"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pelanggan.wallet.index') }}">
+                        <a class="nav-link nav-link-modern {{ request()->routeIs('pelanggan.wallet.*') ? 'active' : '' }}" 
+                           href="{{ route('pelanggan.wallet.index') }}">
                             <i class="fas fa-wallet"></i> KiWallet
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pelanggan.shop') }}">
+                        <a class="nav-link nav-link-modern {{ request()->routeIs('pelanggan.shop') ? 'active' : '' }}" 
+                           href="{{ route('pelanggan.shop') }}">
                             <i class="fas fa-shopping-cart"></i> Belanja
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('pelanggan.transactions') }}">
+                        <a class="nav-link nav-link-modern {{ request()->routeIs('pelanggan.transactions') ? 'active' : '' }}" 
+                           href="{{ route('pelanggan.transactions') }}">
                             <i class="fas fa-receipt"></i> Riwayat
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> {{ auth()->user()->name }}
+                    <li class="nav-item dropdown ms-2">
+                        <a class="nav-link dropdown-toggle user-dropdown-modern" href="#" id="navbarDropdown" 
+                           role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> {{ auth()->user()->name }}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-modern">
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    <button type="submit" class="dropdown-item dropdown-item-modern">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
                                     </button>
                                 </form>
                             </li>
@@ -105,28 +225,14 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="py-4">
+    <main>
         <div class="container">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
             @yield('content')
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-light py-4 mt-5">
+    <!-- Modern Footer -->
+    <footer class="footer-modern">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">

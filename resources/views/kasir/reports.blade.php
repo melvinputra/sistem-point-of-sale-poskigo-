@@ -132,7 +132,7 @@
                     <td>
                         <small>
                             @foreach($sale->saleItems as $item)
-                                {{ $item->item->name }} ({{ $item->quantity }}x)<br>
+                                {{ $item->item ? $item->item->name : '[Item dihapus]' }} ({{ $item->quantity }}x)<br>
                             @endforeach
                         </small>
                     </td>

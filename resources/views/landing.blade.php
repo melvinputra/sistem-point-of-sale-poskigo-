@@ -871,11 +871,8 @@
                 </div>
                 <hr style="border-color: rgba(255,255,255,0.1);">
                 <div class="row">
-                    <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+                    <div class="col-md-12 text-center">
                         <p class="mb-0">&copy; {{ date('Y') }} <span class="brand">POSKigo</span>. All rights reserved.</p>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end">
-                        <p class="mb-0">Made with <i class="fas fa-heart" style="color: #C4FF57;"></i> in Indonesia</p>
                     </div>
                 </div>
             </div>

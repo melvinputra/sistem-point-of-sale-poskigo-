@@ -75,7 +75,7 @@
                         <tbody>
                             @foreach($sale->saleItems as $item)
                             <tr>
-                                <td>{{ $item->item->name }}</td>
+                                <td>{{ $item->item ? $item->item->name : '[Item dihapus]' }}</td>
                                 <td class="text-center">{{ $item->quantity }}</td>
                                 <td class="text-end">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                                 <td class="text-end">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>

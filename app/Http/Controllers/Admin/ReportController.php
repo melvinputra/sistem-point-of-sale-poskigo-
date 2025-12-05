@@ -10,9 +10,7 @@ use App\Models\Item;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Exports\SalesReportExport;
 
 class ReportController extends Controller
 {
@@ -167,9 +165,85 @@ class ReportController extends Controller
         $itemId = $request->input('item_id');
         $categoryId = $request->input('category_id');
 
-        $fileName = 'laporan-penjualan-' . $startDate . '-to-' . $endDate . '.xlsx';
+        // Query dengan filter
+        $query = Sale::with(['user', 'customer', 'saleItems.item'])
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
 
-        return Excel::download(new SalesReportExport($startDate, $endDate, $customerId, $itemId, $categoryId), $fileName);
+        if ($customerId) {
+            $query->where('customer_id', $customerId);
+        }
+
+        if ($itemId) {
+            $query->whereHas('saleItems', function($q) use ($itemId) {
+                $q->where('item_id', $itemId);
+            });
+        }
+
+        if ($categoryId) {
+            $query->whereHas('saleItems.item', function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            });
+        }
+
+        $sales = $query->orderBy('created_at', 'desc')->get();
+
+        $fileName = 'laporan-penjualan-' . $startDate . '-to-' . $endDate . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function() use ($sales) {
+            $file = fopen('php://output', 'w');
+            
+            // UTF-8 BOM untuk Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Header CSV
+            fputcsv($file, [
+                'No',
+                'Tanggal',
+                'ID Transaksi',
+                'Kasir',
+                'Pelanggan',
+                'Barang',
+                'Qty',
+                'Harga Satuan',
+                'Subtotal',
+                'Pajak',
+                'Diskon',
+                'Total'
+            ]);
+
+            // Data
+            $no = 1;
+            foreach ($sales as $sale) {
+                foreach ($sale->saleItems as $item) {
+                    fputcsv($file, [
+                        $no++,
+                        $sale->created_at->format('d/m/Y H:i'),
+                        $sale->id,
+                        $sale->user->name,
+                        $sale->customer ? $sale->customer->name : 'Umum',
+                        $item->item->name,
+                        $item->quantity,
+                        'Rp ' . number_format($item->price, 0, ',', '.'),
+                        'Rp ' . number_format($item->subtotal, 0, ',', '.'),
+                        'Rp ' . number_format($sale->tax_amount, 0, ',', '.'),
+                        'Rp ' . number_format($sale->discount_amount, 0, ',', '.'),
+                        'Rp ' . number_format($sale->total_amount, 0, ',', '.')
+                    ]);
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function exportPdf(Request $request)
